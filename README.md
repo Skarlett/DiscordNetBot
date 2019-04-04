@@ -25,7 +25,7 @@ This bot wasn't made to conquer the other bots on functionality. It was designed
     [ ] Allow new lines in json request
     [ ] Authenification in json request
     [ ] Configuration File
-    [ ] Timeout API request
+    [X] Timeout API request
 
 ## Installation
 ```
