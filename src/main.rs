@@ -14,7 +14,7 @@ use serenity::{
 
 static TOKEN: &'static str = "BOTTOKEN";
 static BIND: &'static str = "0.0.0.0:9449";
-static MASTER: u64 = 191793436976873473;
+static MASTER: u64 = 123456789; //User ID
 
 
 mod api;
