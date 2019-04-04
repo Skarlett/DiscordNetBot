@@ -2,12 +2,12 @@
 A Discord JSON invoked bot over TCP
 
 Index:
-  - 1.0 [Introduction](https://github/Skarlett/DiscordNetBot#Introduction)
-  - 1.1 [Design](https://github/Skarlett/DiscordNetBot#Design)
-  - 2.0 [Installation](https://github/Skarlett/DiscordNetBot#Installation)
-  - 2.1 [Dependencies](https://github/Skarlett/DiscordNetBot#Dependencies)
-  - 3.0 [Using API](https://github/Skarlett/DiscordNetBot#API)
-  - 3.1 [Extending API](https://github/Skarlett/DiscordNetBot#Extending)
+  - 1.0 [Introduction](https://github.com/Skarlett/DiscordNetBot#Introduction)
+  - 1.1 [Design](https://github.com/Skarlett/DiscordNetBot#Design)
+  - 2.0 [Installation](https://github.com/Skarlett/DiscordNetBot#Installation)
+  - 2.1 [Dependencies](https://github.com/Skarlett/DiscordNetBot#Dependencies)
+  - 3.0 [Using API](https://github.com/Skarlett/DiscordNetBot#API)
+  - 3.1 [Extending API](https://github.com/Skarlett/DiscordNetBot#Extending)
 
 
 
