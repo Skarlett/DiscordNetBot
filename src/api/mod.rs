@@ -2,6 +2,7 @@ mod framework;
 
 use framework::models::{Request, Response, Status, UPTIME};
 use framework::{start as _start, models, APIMap};
+use std::time::Duration;
 use std::sync::Arc;
 use std::error::Error;
 use serenity::CACHE;
@@ -22,7 +23,7 @@ macro_rules! API(
 );
 
 
-pub fn start(address: &str) -> std::io::Result<()> {
+pub fn start(address: &str, timeout: &Duration) -> std::io::Result<()> {
    // let mut state = models::State::new();
 
     _start(
@@ -31,7 +32,8 @@ pub fn start(address: &str) -> std::io::Result<()> {
             "msg" => |r| msg(r),
             "info" => |r| info(r)
         },
-        address
+        address,
+        timeout
     )?;
 
     Ok(())

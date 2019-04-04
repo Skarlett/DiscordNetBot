@@ -3,6 +3,8 @@
 #[macro_use] extern crate serde_json;
 #[macro_use] extern crate lazy_static;
 
+
+use std::time::Duration;
 use std::error::Error;
 use serenity::{
     model::{
@@ -12,10 +14,14 @@ use serenity::{
     client::{Client, EventHandler, Context}
 };
 
-static TOKEN: &'static str = "BOTTOKEN";
-static BIND: &'static str = "0.0.0.0:9449";
-static MASTER: u64 = 123456789; //User ID
+static TOKEN: &'static str = "NDYxMzU5NjUwNDk2MDUzMjU4.XKXXXQ.00BDvCeemUfB-wkY5PyuxFZ4WLc";
+static MASTER: u64 = 191793436976873473;
 
+static BIND: &'static str = "0.0.0.0:9449";
+
+lazy_static! {
+    static ref TIMEOUT: Duration = Duration::new(1, 5);
+}
 
 mod api;
 pub struct BotHandler;
@@ -44,7 +50,7 @@ fn main() -> Result<(), Box<dyn Error>> {
         }
     });
     
-    if let Err(why) = api::start(BIND) {
+    if let Err(why) = api::start(BIND, &TIMEOUT) {
         panic!("Couldn\'t open API: {:?}", why);
     }
     Ok(())

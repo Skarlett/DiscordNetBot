@@ -1,6 +1,7 @@
 
 use std::net::{Shutdown, TcpStream, TcpListener};
 use std::io::{Write, BufReader, BufRead};
+use std::time::Duration;
 use threadpool::ThreadPool;
 use std::collections::HashMap;
 use std::error::Error;
@@ -71,13 +72,21 @@ pub fn help_menu(req: models::Request, api: Arc<APIMap>) -> models::Response {
     )
 }
 
-pub fn start(map: APIMap, address: &str) -> std::io::Result<()> {
+pub fn start(map: APIMap, address: &str, timeout: &Duration) -> std::io::Result<()> {
     let pool = ThreadPool::new(num_cpus::get());
     let listener = TcpListener::bind(address)?;
     let api = Arc::new(map);
 
     for stream in listener.incoming() {
-        handle_client(&pool, api.clone(), stream?);
+        let tmo = timeout.clone();
+        match stream {
+            Ok(stream) => {
+                stream.set_read_timeout(Some(tmo));
+                stream.set_write_timeout(Some(tmo));
+                handle_client(&pool, api.clone(), stream);
+            }
+            Err(e) => eprintln!("Accepting Connection Error: {:?}", e)
+        }
     }
     Ok(())
 }
