@@ -1,3 +1,5 @@
+[![Build Status](https://travis-ci.org/Skarlett/DiscordNetBot.svg?branch=master)](https://travis-ci.org/Skarlett/DiscordNetBot)
+
 # DiscordNetBot
 A Discord JSON invoked bot over TCP
 
