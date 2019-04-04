@@ -23,6 +23,8 @@ This bot wasn't made to conquer the other bots on functionality. It was designed
     [ ] Logging
     [ ] Descriptions and arguments in help menu
     [ ] Allow new lines in json request
+    [ ] Authenification in json request
+    [ ] Configuration File
 
 ## Installation
 ```
