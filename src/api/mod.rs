@@ -1,13 +1,11 @@
 mod framework;
-
-use framework::models::{Request, Response, Status, UPTIME};
-use framework::{start as _start, models, APIMap};
+use framework::{start_api, const_var::*};
+use framework::models::*;
 use std::time::Duration;
 use std::sync::Arc;
 use std::error::Error;
 use serenity::CACHE;
 use serenity::model::id::{ChannelId, UserId};
-
 
 // Syntax sugar
 macro_rules! API(
@@ -22,20 +20,15 @@ macro_rules! API(
      };
 );
 
-
 pub fn start(address: &str, timeout: &Duration) -> std::io::Result<()> {
-   // let mut state = models::State::new();
-
-    _start(
+    start_api(
         API!{
-            "test" => |r| Ok(models::Response::ok(&r)),
             "msg" => |r| msg(r),
             "info" => |r| info(r)
         },
         address,
         timeout
     )?;
-
     Ok(())
 }
 
@@ -60,9 +53,8 @@ fn msg(req: Request) -> Result<Response, Box<dyn Error>> {
     Ok(Response::ok(&req))
 }
 
-
 fn info(req: Request) -> Result<Response, Box<dyn Error>>{    
-    let cons = CACHE.read().guilds.iter().map(|(gid, gobj)| {
+    let cons = CACHE.read().guilds.iter().map(|(_gid, gobj)| {
         let mut channels_buf: Vec<(u64, String)> = Vec::new();        
         for (cid, cobj) in &gobj.read().channels {
             channels_buf.push((cid.as_u64().clone(), cobj.read().name.clone()))
