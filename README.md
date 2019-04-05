@@ -20,11 +20,11 @@ This is a bot used for discord. It **doesn't currently have any commands facing 
 ### Design
 This bot wasn't made to conquer the other bots on functionality. It was designed to have a near minimum runtime, allowing it to use the CPU completely through thread pools, and leaving as small as a memory mark as possible. There are other things I would like to add to this bot, but have not yet.
 
-    [ ] Logging
+    [X] Logging
     [ ] Descriptions and arguments in help menu
     [ ] Allow new lines in json request
     [ ] Authenification in json request
-    [ ] Configuration File
+    [X] Configuration File
     [X] Timeout API request
 
 ## Installation

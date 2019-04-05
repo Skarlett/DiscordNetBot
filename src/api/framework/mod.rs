@@ -1,36 +1,29 @@
-
 use std::net::{Shutdown, TcpStream, TcpListener};
-use std::io::{Write, BufReader, BufRead};
+use std::io::{Write, BufReader};
 use std::time::Duration;
 use threadpool::ThreadPool;
-use std::collections::HashMap;
 use std::error::Error;
 use std::sync::Arc;
 
-
 pub mod models;
+pub mod const_var;
 
-pub type APICommand = dyn Fn(models::Request) -> Result<models::Response, Box<dyn Error>> + Send + Sync;
-pub type APIMap = HashMap<&'static str, Arc<APICommand>>;
+use models::*;
 
-
-fn get_request(stream: &TcpStream) -> Result<models::Request, Box<dyn Error>> {
-    let package: models::Request = {
-        let mut rawbuf: String = String::new();
-        let mut reader = BufReader::new(stream);
-        reader.read_line(&mut rawbuf)?;
-        serde_json::from_str(&rawbuf[..])?
+fn get_request(stream: &TcpStream) -> Result<Request, Box<dyn Error>> {
+    let package: Request = {
+        serde_json::from_reader(BufReader::new(stream))?
     };
     Ok(package)
 }
     
-fn respond(map: Arc<APIMap>, request: models::Request) -> Result<models::Response, Box<dyn Error>> {
+fn respond(map: Arc<APIMap>, request: &Request) -> Result<Response, Box<dyn Error>> {
     match map.get(request.action.as_str()) {
         Some(cmd) => {
-                (cmd)(request)
+                (cmd)(request.clone())
             },
         None => {
-            Ok(models::Response::error(models::Status::NoAction, "Not found")) 
+            Ok(Response::error(Status::NoAction, "Not found")) 
         }
     }
 }
@@ -40,23 +33,30 @@ fn handle_client(pool: &ThreadPool, api: Arc<APIMap>, mut stream: TcpStream) {
         let response = match get_request(&stream) {
             Ok(req) => {
                 match req.action.as_str() {
-                    "help" => help_menu(req, api),
+                    "help" => {
+                        info!("Request: {:?} -> help | {}", stream.peer_addr(), req.action);
+                        help_menu(req, api)
+                    },
                     _ => {
-                        match respond(api, req) {
+                        match respond(api, &req) {
                             Ok(response) => {
+                                info!("Request: {:?} -> {}", stream.peer_addr(), req.action);
                                 response
                             },
                             Err(e) => {
-                                models::Response::error(models::Status::NoAction, e)
+                                warn!("Error in Response from {:?} in cmd {}, returning {:?}", stream.peer_addr(), req.action, e);
+                                Response::error(Status::ServerErr, "An Error has occured.")
                             }
                         }
                     }
                 }
             }
+
             Err(_) => {
-                models::Response::error(
-                    models::Status::BadFormat,
-                    "Bad format, Expected Json response\r\n{'action': 'method', 'arguments': ['all strings' ...]} + 0xA "
+                warn!("Failed Request: {:?}", stream.peer_addr());
+                Response::error(
+                    Status::BadFormat,
+                    "Expected format {'action': 'method', 'arguments': ['all strings' ...]}\n"
                 )
             }
         };
@@ -66,13 +66,13 @@ fn handle_client(pool: &ThreadPool, api: Arc<APIMap>, mut stream: TcpStream) {
     });
 }
 
-pub fn help_menu(req: models::Request, api: Arc<APIMap>) -> models::Response {
-    models::Response::ok(&req).body(
+pub fn help_menu(req: Request, api: Arc<APIMap>) -> Response {
+    Response::ok(&req).body(
         json!(api.iter().map(|(k, _)| k).collect::<Vec<_>>())
     )
 }
 
-pub fn start(map: APIMap, address: &str, timeout: &Duration) -> std::io::Result<()> {
+pub fn start_api(map: APIMap, address: &str, timeout: &Duration) -> std::io::Result<()> {
     let pool = ThreadPool::new(num_cpus::get());
     let listener = TcpListener::bind(address)?;
     let api = Arc::new(map);
@@ -85,7 +85,7 @@ pub fn start(map: APIMap, address: &str, timeout: &Duration) -> std::io::Result<
                 stream.set_write_timeout(Some(tmo));
                 handle_client(&pool, api.clone(), stream);
             }
-            Err(e) => eprintln!("Accepting Connection Error: {:?}", e)
+            Err(e) => error!("Accepting Connection Error: {:?}", e)
         }
     }
     Ok(())

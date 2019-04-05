@@ -1,10 +1,10 @@
 use serde_json::Value;
-use std::time::SystemTime;
+use std::error::Error;
+use std::sync::Arc;
+use std::collections::HashMap;
 
-// Because I can.
-lazy_static! {
-    pub static ref UPTIME: SystemTime = SystemTime::now();
-}
+pub type APICommand = dyn Fn(Request) -> Result<Response, Box<dyn Error>> + Send + Sync;
+pub type APIMap = HashMap<&'static str, Arc<APICommand>>;
 
 #[derive(Serialize, Deserialize, Clone, Debug)] // Auto Impl
 pub enum Status {
@@ -53,6 +53,7 @@ impl Response {
         }
     }
 
+    #[allow(dead_code)]
     pub fn status(mut self, s: Status) -> Self {
         self.status = s;
         self
